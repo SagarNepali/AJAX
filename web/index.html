@@ -13,34 +13,39 @@ and open the template in the editor.
         <link href="assets/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css"/>
         <script src="assets/bootstrap/bootstrap.min.js" type="text/javascript"></script>
         <script src="assets/jquery/jquery-2.2.3.min.js" type="text/javascript"></script>
+        <script src="assets/js/models/student.model.js" type="text/javascript"></script>
     </head>
     <body>
         <div class="container" id="output">
 
-<!--            <div id="api"></div>
-            <script>
-                $(document).on("ready", function () {
+            <!--            <div id="api"></div>
+                        <script>
+                            $(document).on("ready", function () {
+            
+                                loadContent();
+                            });
+            
+                            function loadContent() {
+                                $.getJSON("api/studentapi", null, function (data) {
+                                    var content = "";
+                                    $.each(data, function (i, o) {
+                                        content += o.firstName + " " + o.lastName + " ";
+            
+                                    })
+                                    $("#api").html(content);
+                                })
+                            }
+                        </script>-->
 
-                    loadContent();
-                });
-
-                function loadContent() {
-                    $.getJSON("api/studentapi", null, function (data) {
-                        var content = "";
-                        $.each(data, function (i, o) {
-                            content += o.firstName + " " + o.lastName + " ";
-
-                        })
-                        $("#api").html(content);
-                    })
-                }
-            </script>-->
+            <div class="container">
+                <h1 class ="header"> Student Management Sytem </h1>
+            </div>
 
 
             <div  id="table-content">
                 <div class="pull-right">
                     <p>
-                        <a href="javascript:void(0)" class="btn btn-primary btn-sm"> <span class="glyphicon glyphicon-plus"> </a>
+                        <a href="javascript:void(0)" class="btn btn-primary btn-sm" id="add-btn"> <span class="glyphicon glyphicon-plus"> </a>
                     </p>
                 </div>
                 <table class="table table-bordered table-hover table-striped">
@@ -56,32 +61,25 @@ and open the template in the editor.
                     </tr>
 
 
-                    <tr>
-                        <td><input type="checkbox" id="select-all"/></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <a href="" class="btn btn-success btn-sm"> <span class="glyphicon glyphicon-pencil"> </a>
+                   
+<!--                        <td>
+                            <a href="" class="btn btn-success btn-sm"> <span class="glyphicon glyphicon-pencil"></span> </a>
 
-                            <a href="" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure to delete this entry?')" ><span class="glyphicon glyphicon-trash" > </a>
+                            <a href="" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure to delete this entry?')" ><span class="glyphicon glyphicon-trash" ></span> </a>
 
-                        </td>
-                    </tr>
+                        </td>-->
+                   
                 </table>
             </div>
 
-            <div id="student-form"><h1>Add Student Information!</h1>
+            <div id="student-form" style="display:none"><h1>Add Student Information!</h1>
 
 
 
                 <form role="form">
                     <div class="form-group">
                         <label >First Name</label>
-                        <input name="firstName" type="text" class="form-control" id="firstName" placeholder="First Name">
+                        <input name="firstName" type="text" class="form-control" required="required" id="firstName" placeholder="First Name">
                     </div>
                     <div class="form-group">
                         <label >Last Name</label>
@@ -95,9 +93,9 @@ and open the template in the editor.
                         <label >Contact</label>
                         <input name="contact" type="text" class="form-control" required="required" id="contact" placeholder="Contact">
                     </div>
-                    <div class="form-group">
-                        <label >Status</label>
-                        <input type="checkbox" class="form-control" required="required" id="status">
+                    <div class="checkbox">
+                        <label > <input type="checkbox" name="status" id="status"/>Status </label>
+
                     </div>
 
 
@@ -110,18 +108,56 @@ and open the template in the editor.
         </div>
 
         <script>
-            $("#add-btn").on("click", function () {
-                $("#table-content").hide();
-                $("#student-form").slidetoggle();
-            });
+
 
             $(document).on("ready", function () {
+
                 $("#check-all").on("click", function () {
                     var $this = $(this);
                     $(".select-all").prop("checked", $this.is(":checked"));
+                });
+                $("#add-btn").on("click", function () {
+
+                    $("#table-content").hide();
+                    $("#student-form").slideToggle();
+                });
+                $("#back-btn").on("click", function () {
+
+                    $("#student-form").slideToggle('auto', function () {
+                        $("#table-content").show();
+                    });
 
                 });
+                $("#save-btn").on("click", function () {
+                    var student = new Student();
+                    student.firstname = $("#firstName").val();
+                    student.laststname = $("#lastName").val();
+                    student.address = $("#address").val();
+                    student.contact = $("#contact").val();
+                    student.status = $("#status").is(":checked");
+
+                    console.log(student);
+                    return false;
+                    $("#back-btn").click();
+                    reload();
+                });
+
             });
+            
+            function reload(){
+                $table = $("#table-content");
+                $.each(studentList.getAll(),function(i,o){
+                   $tr =  $table.append("<tr></tr>");
+                   $('<td><input type="checkbox" class="select-all"/></td>').appendTo($tr);
+                   $('<td>'+o.id+'</td>').appendTo($tr);
+                   $('<td>'+o.firstName+'</td>').appendTo($tr);
+                   $('<td>'+o.lastName+'</td>').appendTo($tr);
+                   $('<td>'+o.address+'</td>').appendTo($tr);
+                   $('<td>'+o.contact+'</td>').appendTo($tr);
+                   $('<td>'+o.status+'</td>').appendTo($tr);
+                   $tr.appendTo($table);
+                });
+            }
 
         </script>
     </body>
